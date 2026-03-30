@@ -41,3 +41,6 @@ run = "lefthook install"
 [tasks.serve]
 description = "Start PHP built-in development server"
 run = "php -S localhost:8080 -t public"
+
+[hooks]
+postinstall = "lefthook install"
