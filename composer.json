@@ -1,0 +1,32 @@
+{
+    "name": "endoumame/php-mago-template",
+    "description": "Minimal PHP project template with Mago linter, formatter, and static analyzer",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.4",
+        "php-di/php-di": "^7.1",
+        "endoumame/php-monad": "^1.3",
+        "slim/psr7": "^1.8",
+        "slim/slim": "^4.15"
+    },
+    "require-dev": {
+        "carthage-software/mago": "^1.15",
+        "giorgiosironi/eris": "^1.0",
+        "phpunit/phpunit": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
