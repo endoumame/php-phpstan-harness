@@ -6,7 +6,7 @@ set -euo pipefail
 input="$(cat)"
 FILE="$(jq -r '.tool_input.file_path // .tool_input.path // empty' <<< "$input")"
 
-PROTECTED="mago.toml phpunit.xml composer.lock .env"
+PROTECTED="phpstan.neon phpcs.xml phpunit.xml composer.lock .env"
 
 for p in $PROTECTED; do
   case "$FILE" in

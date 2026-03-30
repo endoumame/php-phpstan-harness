@@ -30,7 +30,9 @@
       "Bash(sort:*)",
       "Bash(tail:*)",
       "Bash(tree:*)",
-      "Bash(vendor/bin/mago:*)",
+      "Bash(vendor/bin/phpstan:*)",
+      "Bash(vendor/bin/phpcs:*)",
+      "Bash(vendor/bin/phpcbf:*)",
       "Bash(vendor/bin/phpunit:*)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:arxiv.org)",
@@ -113,7 +115,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/post-mago-annotation-guard.sh"
+            "command": "bash .claude/hooks/post-suppress-annotation-guard.sh"
           }
         ]
       }

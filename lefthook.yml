@@ -1,12 +1,10 @@
 pre-commit:
   parallel: true
   commands:
-    lint:
-      run: ./vendor/bin/mago lint
-    format-check:
-      run: ./vendor/bin/mago format --check
-    analyze:
-      run: ./vendor/bin/mago analyze
+    phpcs:
+      run: ./vendor/bin/phpcs
+    phpstan:
+      run: ./vendor/bin/phpstan analyse --no-progress
     test-unit:
       run: ./vendor/bin/phpunit --testsuite Unit
     test-property:

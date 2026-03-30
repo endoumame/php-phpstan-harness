@@ -10,27 +10,27 @@ case "$file" in
   *) exit 0 ;;
 esac
 
-# Skip vendor files — those are third-party and not under our control
+# Skip vendor files
 case "$file" in
   vendor/*|*/vendor/*) exit 0 ;;
 esac
 
 [ -f "$file" ] || exit 0
 
-# Check for @mago-expect or @mago-ignore annotations
+# Check for @phpstan-ignore or phpcs:ignore annotations
 found=""
 details=""
 
-if matches="$(grep -n '@mago-expect' "$file" 2>/dev/null)"; then
-  found="@mago-expect"
+if matches="$(grep -n '@phpstan-ignore' "$file" 2>/dev/null)"; then
+  found="@phpstan-ignore"
   details="$matches"
 fi
 
-if matches="$(grep -n '@mago-ignore' "$file" 2>/dev/null)"; then
+if matches="$(grep -n 'phpcs:ignore' "$file" 2>/dev/null)"; then
   if [ -n "$found" ]; then
-    found="$found and @mago-ignore"
+    found="$found and phpcs:ignore"
   else
-    found="@mago-ignore"
+    found="phpcs:ignore"
   fi
   details="${details:+$details
 }$matches"
@@ -40,12 +40,12 @@ if [ -n "$found" ]; then
   msg="[POLICY VIOLATION] ${found} annotation(s) detected in ${file}:
 ${details}
 
-This project PROHIBITS the use of @mago-expect and @mago-ignore annotations (see ADR: docs/ADR/20260322-allow-mago-ignore-for-slim-route-handlers.md).
+This project PROHIBITS the use of @phpstan-ignore and phpcs:ignore annotations.
 You MUST:
 1. Remove the ${found} annotation(s) you just wrote
 2. Fix the underlying code issue that the annotation was suppressing
-3. If the mago warning is unavoidable due to framework constraints, leave the warning as-is (do NOT suppress it)
-Do NOT add @mago-expect or @mago-ignore to project source code."
+3. If the warning is unavoidable due to framework constraints, leave the warning as-is (do NOT suppress it)
+Do NOT add @phpstan-ignore or phpcs:ignore to project source code."
 
   jq -Rn --arg msg "$msg" '{
     hookSpecificOutput: {

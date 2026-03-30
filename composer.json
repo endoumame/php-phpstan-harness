@@ -1,6 +1,6 @@
 {
-    "name": "endoumame/php-mago-template",
-    "description": "Minimal PHP project template with Mago linter, formatter, and static analyzer",
+    "name": "endoumame/php-phpstan-template",
+    "description": "Minimal PHP project template with PHPStan static analyzer and PHP_CodeSniffer",
     "type": "project",
     "license": "MIT",
     "require": {
@@ -11,9 +11,11 @@
         "slim/slim": "^4.15"
     },
     "require-dev": {
-        "carthage-software/mago": "^1.15",
         "giorgiosironi/eris": "^1.0",
-        "phpunit/phpunit": "^13.0"
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^13.0",
+        "squizlabs/php_codesniffer": "^3.13"
     },
     "autoload": {
         "psr-4": {

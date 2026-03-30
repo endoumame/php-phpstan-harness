@@ -12,18 +12,20 @@ esac
 
 cd "$CLAUDE_PROJECT_DIR"
 
-# Format the file (suppress errors)
-vendor/bin/mago fmt "$file" >/dev/null 2>&1 || true
+# Auto-fix with phpcbf (suppress errors — exit code 1 means fixes were applied)
+vendor/bin/phpcbf --standard=phpcs.xml "$file" >/dev/null 2>&1 || true
 
-# Lint + analyze: capture output containing warnings or errors regardless of exit code
+# PHPCS: check for remaining violations
 diag=""
-lint="$(vendor/bin/mago lint "$file" 2>&1 | head -20)" || true
-if echo "$lint" | grep -qE '(error|warning|help)\['; then
-  diag="$lint"
+phpcs_out="$(vendor/bin/phpcs --standard=phpcs.xml "$file" 2>&1 | head -20)" || true
+if echo "$phpcs_out" | grep -qE '(ERROR|WARNING)'; then
+  diag="$phpcs_out"
 fi
-analyze="$(vendor/bin/mago analyze "$file" 2>&1 | head -20)" || true
-if echo "$analyze" | grep -qE '(error|warning|help)\['; then
-  diag="$diag"$'\n'"$analyze"
+
+# PHPStan: analyze the file
+phpstan_out="$(vendor/bin/phpstan analyse --no-progress "$file" 2>&1 | head -20)" || true
+if echo "$phpstan_out" | grep -qE '(Error|--.*Line)'; then
+  diag="$diag"$'\n'"$phpstan_out"
 fi
 
 if [ -n "$diag" ]; then

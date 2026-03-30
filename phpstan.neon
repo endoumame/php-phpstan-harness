@@ -1,0 +1,21 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    phpVersion: 80500
+    level: max
+    paths:
+        - src
+        - tests
+    tmpDir: .phpstan-cache
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: false
+
+    strictRules:
+        allRules: true
+
+    exceptions:
+        check:
+            missingCheckedExceptionInThrows: true
+            tooWideThrowType: true
+        implicitThrows: false
