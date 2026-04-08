@@ -144,5 +144,6 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high"
 }
