@@ -96,6 +96,11 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/install_pkgs.sh"
+          },
+          {
+            "type": "command",
+            "command": "bun x gh-setup-hooks",
+            "timeout": 120
           }
         ]
       }
@@ -144,6 +149,5 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true
   },
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "high"
+  "alwaysThinkingEnabled": true
 }
