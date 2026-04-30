@@ -15,3 +15,45 @@ steer = true
 
 [tui]
 status_line = ["current-dir", "git-branch"]
+
+# ---------------------------------------------------------------------------
+# Hooks
+# Mirror the .claude/hooks/* behaviour for Codex sessions:
+#   - PreToolUse  : block edits to protected config files
+#   - PostToolUse : run phpcbf/phpcs/phpstan on edited PHP files,
+#                   forbid @phpstan-ignore / phpcs:ignore annotations
+#   - UserPromptSubmit : block prompts containing API keys / tokens
+# Commands are wrapped with `git rev-parse --show-toplevel` so they remain
+# stable when Codex is launched from a subdirectory.
+# ---------------------------------------------------------------------------
+
+[[hooks.PreToolUse]]
+matcher = "^apply_patch$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/pre-protected-file-guard.sh"'
+statusMessage = "Checking protected files"
+timeout = 30
+
+[[hooks.PostToolUse]]
+matcher = "^apply_patch$"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/post-php-lint.sh"'
+statusMessage = "Running phpcs / phpstan"
+timeout = 180
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/post-suppress-annotation-guard.sh"'
+statusMessage = "Checking suppress annotations"
+timeout = 30
+
+[[hooks.UserPromptSubmit]]
+
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/user-prompt-secret-guard.sh"'
+timeout = 10
