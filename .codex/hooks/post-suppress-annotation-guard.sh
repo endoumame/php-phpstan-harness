@@ -12,22 +12,46 @@ cd "$project_dir"
 
 files=()
 
-mapfile -t direct < <(jq -r '
-  [ .tool_input.file_path?, .tool_input.path?, .tool_input.target_file? ]
-  | map(select(. != null and . != ""))
-  | .[]
-' <<< "$input" 2>/dev/null || true)
-files+=("${direct[@]}")
+while IFS= read -r path; do
+  [ -n "$path" ] && files+=("$path")
+done < <(
+  jq -r '
+    [ .tool_input.file_path?, .tool_input.path?, .tool_input.target_file? ]
+    | map(select(. != null and . != ""))
+    | .[]
+  ' <<< "$input" 2>/dev/null || true
+)
 
-patch_body="$(jq -r '.tool_input.input // .tool_input.patch // empty' <<< "$input" 2>/dev/null || true)"
+patch_body="$(jq -r '
+  def patch_from_command:
+    (
+      .tool_input.command?
+      // (.tool_input.arguments? | strings | fromjson? | .command?)
+      // empty
+    )
+    | if type == "array" then .[1] // empty
+      elif type == "string" then .
+      else empty
+      end;
+
+  patch_from_command // .tool_input.input // .tool_input.patch // empty
+' <<< "$input" 2>/dev/null || true)"
 if [ -n "$patch_body" ]; then
   while IFS= read -r path; do
     [ -n "$path" ] && files+=("$path")
   done < <(printf '%s\n' "$patch_body" | sed -nE 's/^\*\*\* (Update|Add|Move) File: (.+)$/\2/p')
 fi
 
-declare -A seen=()
 targets=()
+has_target() {
+  local needle="$1"
+  local existing
+  for existing in "${targets[@]:-}"; do
+    [ "$existing" = "$needle" ] && return 0
+  done
+  return 1
+}
+
 for f in "${files[@]:-}"; do
   [ -z "$f" ] && continue
   case "$f" in
@@ -37,9 +61,8 @@ for f in "${files[@]:-}"; do
   case "$f" in
     vendor/*|*/vendor/*) continue ;;
   esac
-  [ -n "${seen[$f]:-}" ] && continue
-  seen[$f]=1
   [ -f "$f" ] || continue
+  has_target "$f" && continue
   targets+=("$f")
 done
 

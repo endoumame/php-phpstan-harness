@@ -7,14 +7,30 @@ input="$(cat)"
 
 files=()
 
-mapfile -t direct < <(jq -r '
-  [ .tool_input.file_path?, .tool_input.path?, .tool_input.target_file? ]
-  | map(select(. != null and . != ""))
-  | .[]
-' <<< "$input" 2>/dev/null || true)
-files+=("${direct[@]}")
+while IFS= read -r path; do
+  [ -n "$path" ] && files+=("$path")
+done < <(
+  jq -r '
+    [ .tool_input.file_path?, .tool_input.path?, .tool_input.target_file? ]
+    | map(select(. != null and . != ""))
+    | .[]
+  ' <<< "$input" 2>/dev/null || true
+)
 
-patch_body="$(jq -r '.tool_input.input // .tool_input.patch // empty' <<< "$input" 2>/dev/null || true)"
+patch_body="$(jq -r '
+  def patch_from_command:
+    (
+      .tool_input.command?
+      // (.tool_input.arguments? | strings | fromjson? | .command?)
+      // empty
+    )
+    | if type == "array" then .[1] // empty
+      elif type == "string" then .
+      else empty
+      end;
+
+  patch_from_command // .tool_input.input // .tool_input.patch // empty
+' <<< "$input" 2>/dev/null || true)"
 if [ -n "$patch_body" ]; then
   while IFS= read -r path; do
     [ -n "$path" ] && files+=("$path")
